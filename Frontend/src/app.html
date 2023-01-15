@@ -1,11 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>Titanfall Unity</title>
     <meta name="description" content="This is a Titanfall Unity remake.">
-    <link rel="stylesheet" href="css/style.css">
+	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <link rel="stylesheet" href="%sveltekit.assets%/style.css">
     <script src="https://kit.fontawesome.com/0d8a9da77c.js" crossorigin="anonymous"></script>
     <script src="js/main.js"></script>
+	%sveltekit.head%
 </head>
-<body>
+<body data-sveltekit-preload-data="hover">
+  <div style="display: contents">%sveltekit.body%</div>
   <section id="login" class="login-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
       <form>
@@ -26,3 +31,4 @@
     </div>
   </section>
 </body>
+</html>
