@@ -28,8 +28,8 @@ public class AccountController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/login")
-    public Mono<LoginResponse> login(ServerRequest serverRequest) {
+    @PostMapping("/auth")
+    public Mono<LoginResponse> auth(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(JSONObject.class)
                 .flatMap(jsonObject -> {
                     String username, password, version;
