@@ -32,13 +32,16 @@ public class AccountController {
     public Mono<LoginResponse> login(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(JSONObject.class)
                 .flatMap(jsonObject -> {
-                    String username, password;
+                    String username, password, version;
                     try {
                         username = jsonObject.getString("username");
                         password = jsonObject.getString("password");
+                        version = jsonObject.getString("version");
                     } catch (JSONException e) {
                         return Mono.just(new LoginResponse(3, null,"Invalid JSON"));
                     }
+
+                    // TODO:: add future version check
 
                     return userRepository.findByName(username).elementAt(0)
                             .onErrorReturn(new User("", "", "", false, new Date(), new Date()))
