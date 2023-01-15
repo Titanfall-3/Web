@@ -1,0 +1,1 @@
+Heavily inspired by [Fajurion/Learn](https://github.com/Fajurion/learn)

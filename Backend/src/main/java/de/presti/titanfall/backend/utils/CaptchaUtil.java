@@ -3,8 +3,8 @@ package de.presti.titanfall.backend.utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -23,34 +23,32 @@ public class CaptchaUtil {
 
     public HttpClient httpClient = HttpClient.newHttpClient();
 
-    public boolean validCaptcha(String gRecaptchaToken) {
-        if (gRecaptchaToken == null) return false;
-        String secretKey = captchaSettings.getSecret(); //use your secret key
-        float expectedScore = 0.9f, scoreFromResponse = 0; //set the expectedScore as per your requirement
+    public Mono<Boolean> validCaptcha(String gRecaptchaToken) {
+        if (gRecaptchaToken == null) return Mono.just(false);
 
-        HttpRequest httpRequest;
-        try {
-            httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("https://hcaptcha.com/siteverify"))
+        String secretKey = captchaSettings.getSecret(); //use your secret key
+        float expectedScore = 0.9f; //set the expectedScore as per your requirement
+
+        return Mono.just(gRecaptchaToken).flatMap(token -> {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://hcaptcha.com/siteverify"))
                     .POST(HttpRequest.BodyPublishers.ofString("secret=" + secretKey + "&response=" + gRecaptchaToken))
                     .header("User-Agent", "Titanfall-Backend/1.0")
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .build();
-        } catch (Exception ignore) {
-            return false;
-        }
+                    .build();;
 
-        HttpResponse<String> httpResponse;
-        try {
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception ignore) {
-            return false;
-        }
+            return Mono.just(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body));
+        }).flatMap(body -> {
+            JsonObject jsonObject = null;
+            try {
+                jsonObject = JsonParser.parseString(body.get()).getAsJsonObject();
+            } catch (Exception e) {
+                Mono.just(false);
+            }
 
-        JsonObject jsonObject = JsonParser.parseString(httpResponse.body()).getAsJsonObject();
-
-        scoreFromResponse = jsonObject.has("score") ? Float.parseFloat(jsonObject.get("score").toString()) : 1.0F;
-        return jsonObject.get("success").getAsBoolean() && scoreFromResponse >= expectedScore;
+            float scoreFromResponse = jsonObject.has("score") ? Float.parseFloat(jsonObject.get("score").toString()) : 1.0F;
+            return Mono.just(jsonObject.get("success").getAsBoolean() && scoreFromResponse >= expectedScore);
+        });
     }
 
 }
