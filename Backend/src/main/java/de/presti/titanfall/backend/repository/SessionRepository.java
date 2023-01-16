@@ -1,7 +1,6 @@
 package de.presti.titanfall.backend.repository;
 
 import de.presti.titanfall.backend.entities.Session;
-import de.presti.titanfall.backend.entities.User;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -18,5 +17,5 @@ public interface SessionRepository extends ReactiveCrudRepository<Session, Strin
     Flux<Session> findByToken(String token);
 
     @Query("DELETE FROM session WHERE user_id = :userId")
-    Mono<Session> deleteAllByUser(long userId);
+    Mono<Void> deleteAllByUser(long userId);
 }

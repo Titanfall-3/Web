@@ -14,8 +14,8 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     Flux<User> findByName(String username);
 
     @Query("SELECT * FROM user WHERE email = :email")
-    Flux<User> findByEmail(String email);
+    Flux<User> findAllByEmail(String email);
 
     @Query("SELECT * FROM user WHERE admin = :admin")
-    Flux<User> findAdmin(boolean admin);
+    Flux<User> findAllAdmin(boolean admin);
 }
