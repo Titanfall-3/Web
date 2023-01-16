@@ -1,7 +1,7 @@
 <script lang="ts">
     import { baseApiPath } from "../lib/config";
     import { accountData, refreshAccount } from "../lib/account";
-    import { loggedIn } from "../lib/store.js";
+    import { isLoggedIn } from "../lib/store.js";
     import Panel from "../components/Panel.svelte";
     import { onMount } from "svelte";
 
@@ -33,7 +33,6 @@
             if (resultJson.success) {
                 document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
                 accountData.set(resultJson.user)
-                loggedIn.set(true)
                 error = false;
                 return;
             }
@@ -63,7 +62,6 @@
             if (resultJson.success) {
                 document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
                 accountData.set(resultJson.user)
-                loggedIn.set(true)
                 error = false;
                 return;
             }
@@ -85,7 +83,7 @@
     </section>
 {/if}
 
-{#if tryingLogin && !loggedIn === false}
+{#if tryingLogin && !isLoggedIn(accountData)}
 <section id="login" class="login-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
         <form>
@@ -100,7 +98,7 @@
         </form>
     </div>
 </section>
-{:else if !tryingLogin && loggedIn === false}
+{:else if !tryingLogin && !isLoggedIn(accountData)}
 <section id="register" class="register-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
         <form>
@@ -117,6 +115,6 @@
         </form>
     </div>
 </section>
-{:else if loggedIn === true}
+{:else if isLoggedIn(accountData)}
     <Panel />
 {/if}

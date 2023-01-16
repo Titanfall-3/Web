@@ -1,3 +1,4 @@
-import { writable } from "svelte/store";
 
-export const loggedIn = writable<boolean>(true)
+export function isLoggedIn(accountData: any) : boolean {
+    return typeof(accountData) === undefined;
+}
