@@ -1,12 +1,16 @@
 <script lang="ts">
     import { baseApiPath } from "../lib/config";
+    import { accountData, refreshAccount } from "../lib/account";
+    import { loggedIn } from "../lib/store.js";
     import Panel from "../components/Panel.svelte";
+    import { onMount } from "svelte";
 
-    // TODO:: add check for session.
+    onMount(() => {
+        refreshAccount()
+    })
+
     let tryingLogin = true;
-    let loggedIn = false;
     export let siteKey = "9dc06c51-f075-4f7a-9335-9346a4c7280a";
-    export let user;
     let error;
     let message;
 
@@ -28,8 +32,8 @@
         }).then(resultJson => {
             if (resultJson.success) {
                 document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
-                user = resultJson.user;
-                loggedIn = true;
+                accountData.set(resultJson.user)
+                loggedIn.set(true)
                 error = false;
                 return;
             }
@@ -58,8 +62,8 @@
         }).then(resultJson => {
             if (resultJson.success) {
                 document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
-                user = resultJson.user;
-                loggedIn = true;
+                accountData.set(resultJson.user)
+                loggedIn.set(true)
                 error = false;
                 return;
             }
@@ -81,7 +85,7 @@
     </section>
 {/if}
 
-{#if tryingLogin && !loggedIn}
+{#if tryingLogin && !loggedIn === false}
 <section id="login" class="login-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
         <form>
@@ -96,7 +100,7 @@
         </form>
     </div>
 </section>
-{:else if !tryingLogin && !loggedIn}
+{:else if !tryingLogin && loggedIn === false}
 <section id="register" class="register-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
         <form>
@@ -113,6 +117,6 @@
         </form>
     </div>
 </section>
-{:else if loggedIn}
-    <Panel user={user} />
+{:else if loggedIn === true}
+    <Panel />
 {/if}
