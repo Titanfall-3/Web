@@ -8,6 +8,7 @@ import de.presti.titanfall.backend.repository.UserRepository;
 import de.presti.titanfall.backend.services.SessionServices;
 import de.presti.titanfall.backend.utils.CaptchaUtil;
 import de.presti.titanfall.backend.utils.HashUtil;
+import de.presti.titanfall.backend.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -77,6 +78,34 @@ public class AccountController {
 
     //endregion
 
+    //region Refresh
+    @CrossOrigin
+    @PostMapping("/refresh")
+    public Mono<RefreshResponse> refresh(@RequestBody RefreshForm refreshForm) {
+        return sessionServices.checkAndRefreshSession(refreshForm.token)
+                .flatMap(session -> {
+                    if (session == null) return Mono.error(new Exception("Invalid Session."));
+
+                    return userRepository.findById(session.getUserId());
+                }).flatMap(user -> {
+                    if (user == null) return Mono.error(new Exception("Invalid Session"));
+
+                    return Mono.just(new RefreshResponse(true, UserUtil.createCleanUser(user), "Worked!"));
+                })
+                .onErrorResume(Exception.class, e -> Mono.just(new RefreshResponse(false, null, e.getMessage())))
+                .onErrorReturn(new RefreshResponse(false, null, "Server Error!"));
+    }
+
+
+    public record RefreshResponse(boolean success, User user, String message) {
+    }
+
+    public record RefreshForm(String token) {
+    }
+
+
+    //endregion
+
     //region Login
 
     @CrossOrigin
@@ -105,7 +134,7 @@ public class AccountController {
 
                         if (HashUtil.encoder().matches(loginForm.password, user.getPassword())) {
                             return sessionServices.generateSession(user.getId())
-                                    .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), user, "Login successful!")));
+                                    .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), UserUtil.createCleanUser(user), "Login successful!")));
                         } else {
                             return Mono.just(new LoginResponse(false, null, null, "Invalid password"));
                         }
@@ -149,7 +178,7 @@ public class AccountController {
                                     registerForm.email, invite.isAdmin(), LocalDateTime.now(), LocalDateTime.now());
                             return userRepository.save(newUser)
                                     .flatMap(user -> sessionServices.generateSession(user.getId())
-                                            .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), user, "Register successful!"))));
+                                            .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), UserUtil.createCleanUser(user), "Register successful!"))));
                         });
                     });
         });
