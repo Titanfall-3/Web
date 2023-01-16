@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
+import java.time.ZoneId;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -43,7 +45,7 @@ public class SessionServices {
 
             // Remove old sessions
             for(Session session : list) {
-                if(session.getCreated().toInstant().toEpochMilli() + TimeUnit.DAYS.toMillis(3) < System.currentTimeMillis()) {
+                if(session.getCreated().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() + TimeUnit.DAYS.toMillis(3) < System.currentTimeMillis()) {
                     toDelete.add(session);
                 }
             }
@@ -57,8 +59,8 @@ public class SessionServices {
             return Mono.zip(
                     // Delete all tfa sessions
                     sessionRepository.deleteAllByUser(userID).thenReturn("deleted"),
-                    sessionRepository.save(new Session(token.get(), userID, new Date(), new Date())),
-                    sessionRepository.deleteAll(toDelete).thenReturn(new Session("d", -1, new Date(), new Date())));
+                    sessionRepository.save(new Session(token.get(), userID, LocalDateTime.now(), LocalDateTime.now())),
+                    sessionRepository.deleteAll(toDelete).thenReturn(new Session("d", -1, LocalDateTime.now(), LocalDateTime.now())));
         }).map(Tuple2::getT2);
     }
 
@@ -77,14 +79,14 @@ public class SessionServices {
             }
 
             // Check if session is timed out
-            if(sessions.get(0).getLogin().toInstant().toEpochMilli() + TimeUnit.DAYS.toMillis(3) < System.currentTimeMillis()) {
+            if(sessions.get(0).getLogin().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() + TimeUnit.DAYS.toMillis(3) < System.currentTimeMillis()) {
 
                 // Delete session
                 return sessionRepository.delete(sessions.get(0)).thenReturn("delete");
             }
 
             // Refresh session
-            sessions.get(0).setLogin(new Date());
+            sessions.get(0).setLogin(LocalDateTime.now());
 
             // Save session
             return sessionRepository.save(sessions.get(0));

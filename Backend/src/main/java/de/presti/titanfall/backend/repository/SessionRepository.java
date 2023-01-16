@@ -11,9 +11,9 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface SessionRepository extends ReactiveCrudRepository<Session, String> {
 
-    @Query("SELECT * FROM session WHERE userId = :userid")
+    @Query("SELECT * FROM session WHERE user_id = :userId")
     Flux<Session> findByUser(long userId);
 
-    @Query("DELETE FROM session WHERE userId = :userid")
+    @Query("DELETE FROM session WHERE user_id = :userId")
     Mono<Session> deleteAllByUser(long userId);
 }

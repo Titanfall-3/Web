@@ -10,6 +10,6 @@ public class HashUtil {
 
     @Bean
     public static PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(3, new SecureRandom());
+        return new BCryptPasswordEncoder(-1, new SecureRandom());
     }
 }

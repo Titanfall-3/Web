@@ -9,16 +9,12 @@ import de.presti.titanfall.backend.services.SessionServices;
 import de.presti.titanfall.backend.utils.CaptchaUtil;
 import de.presti.titanfall.backend.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/account")
@@ -46,7 +42,8 @@ public class AccountController {
             return Mono.just(new AuthResponse(2, null, "Invalid post data"));
         }
 
-        return userRepository.findByName(authForm.username).onErrorReturn(new User("", "", "", false, new Date(), new Date())).flatMap(user -> {
+        return userRepository.findByName(authForm.username).elementAt(0).onErrorReturn(new User("", "", "", false,
+                LocalDateTime.now(), LocalDateTime.now())).flatMap(user -> {
             if (user.getUsername().isBlank()) {
                 return Mono.just(new AuthResponse(2, null, "User not found"));
             }
@@ -84,35 +81,39 @@ public class AccountController {
 
     @CrossOrigin
     @PostMapping("/login")
-    public Mono<LoginResponse> login(ServerRequest serverRequest, @RequestBody LoginForm loginForm) {
+    public Mono<LoginResponse> login(@RequestBody LoginForm loginForm) {
 
-        Optional<Object> optionalCaptcha = serverRequest.attribute("h-captcha-response");
-        String usedCaptchaSolve = loginForm.captchaKey == null ? (String) optionalCaptcha.orElse(null) : loginForm.captchaKey;
+        //// Optional<Object> optionalCaptcha = serverRequest.attribute("h-captcha-response");
+        //// String usedCaptchaSolve = loginForm.captchaKey == null ? (String) optionalCaptcha.orElse(null) : loginForm.captchaKey;
+        String usedCaptchaSolve = loginForm.captchaKey;
 
         if (loginForm.username == null || loginForm.password == null || usedCaptchaSolve == null) {
-            return Mono.just(new LoginResponse(false, null, "Invalid post data"));
+            return Mono.just(new LoginResponse(false, null, null, "Invalid post data"));
         }
 
         return captchaUtil.validCaptcha(usedCaptchaSolve).flatMap(value -> {
-            if (!value) return Mono.just(new LoginResponse(false, null, "Invalid captcha"));
+            if (!value) return Mono.just(new LoginResponse(false, null, null, "Invalid captcha"));
 
-            return userRepository.findByName(loginForm.username).onErrorReturn(new User("", "", "", false, new Date(), new Date())).flatMap(user -> {
+            return userRepository.findByName(loginForm.username)
+                    .elementAt(0)
+                    .onErrorReturn(new User("", "", "", false, LocalDateTime.now(), LocalDateTime.now()))
+                    .flatMap(user -> {
 
-                if (user.getUsername().isBlank()) {
-                    return Mono.just(new LoginResponse(false, null, "User not found"));
-                }
+                        if (user.getUsername().isBlank()) {
+                            return Mono.just(new LoginResponse(false, null, null, "User not found"));
+                        }
 
-                if (HashUtil.encoder().matches(loginForm.password, user.getPassword())) {
-                    return sessionServices.generateSession(user.getId())
-                            .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), "Login successful!")));
-                } else {
-                    return Mono.just(new LoginResponse(false, null, "Invalid password"));
-                }
-            });
+                        if (HashUtil.encoder().matches(loginForm.password, user.getPassword())) {
+                            return sessionServices.generateSession(user.getId())
+                                    .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), user, "Login successful!")));
+                        } else {
+                            return Mono.just(new LoginResponse(false, null, null, "Invalid password"));
+                        }
+                    });
         });
     }
 
-    public record LoginResponse(boolean success, String data, String message) {
+    public record LoginResponse(boolean success, String data, User user, String message) {
     }
 
     public record LoginForm(String username, String password, String captchaKey) {
@@ -124,29 +125,31 @@ public class AccountController {
 
     @CrossOrigin
     @PostMapping("/register")
-    public Mono<LoginResponse> register(ServerRequest serverRequest, @RequestBody RegisterForm registerForm) {
+    public Mono<LoginResponse> register(@RequestBody RegisterForm registerForm) {
 
-        Optional<Object> optionalCaptcha = serverRequest.attribute("h-captcha-response");
-        String usedCaptchaSolve = registerForm.captchaKey == null ? (String) optionalCaptcha.orElse(null) : registerForm.captchaKey;
+        //// Optional<Object> optionalCaptcha = serverRequest.attribute("h-captcha-response");
+        //// String usedCaptchaSolve = loginForm.captchaKey == null ? (String) optionalCaptcha.orElse(null) : loginForm.captchaKey;
+        String usedCaptchaSolve = registerForm.captchaKey;
 
         if (registerForm.username == null || registerForm.password == null || registerForm.email == null || registerForm.invite == null || usedCaptchaSolve == null) {
-            return Mono.just(new LoginResponse(false, null, "Invalid post data"));
+            return Mono.just(new LoginResponse(false, null, null, "Invalid post data"));
         }
 
         return captchaUtil.validCaptcha(usedCaptchaSolve).flatMap(value -> {
-            if (!value) return Mono.just(new LoginResponse(false, null, "Invalid captcha"));
+            if (!value) return Mono.just(new LoginResponse(false, null, null, "Invalid captcha"));
 
-            return inviteRepository.findById(registerForm.invite).onErrorReturn(new Invite("", 0, false, new Date()))
-                    .defaultIfEmpty(new Invite("", 0, false, new Date())).flatMap(invite -> {
+            return inviteRepository.findByCode(registerForm.invite)
+                    .defaultIfEmpty(new Invite("", 0, false, LocalDateTime.now())).flatMap(invite -> {
 
-                        if (invite.getCode().isBlank() || invite.getUserId() == 0)
-                            return Mono.just(new LoginResponse(false, null, "Invalid invite code"));
+                        if (invite.getCode().isBlank())
+                            return Mono.just(new LoginResponse(false, null, null, "Invalid invite code"));
 
                         return inviteRepository.delete(invite).thenReturn("Deleted invite").flatMap(s -> {
-                            User newUser = new User(registerForm.username, HashUtil.encoder().encode(registerForm.password), registerForm.email, invite.isAdmin(), new Date(), new Date());
+                            User newUser = new User(registerForm.username, HashUtil.encoder().encode(registerForm.password),
+                                    registerForm.email, invite.isAdmin(), LocalDateTime.now(), LocalDateTime.now());
                             return userRepository.save(newUser)
                                     .flatMap(user -> sessionServices.generateSession(user.getId())
-                                            .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), "Register successful!"))));
+                                            .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), user, "Register successful!"))));
                         });
                     });
         });

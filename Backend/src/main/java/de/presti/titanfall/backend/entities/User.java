@@ -1,13 +1,12 @@
 package de.presti.titanfall.backend.entities;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @Getter(AccessLevel.PUBLIC)
 public class User {
     @Id
@@ -26,12 +25,12 @@ public class User {
     public boolean admin;
 
     @Column("created_at")
-    Date created;
+    LocalDateTime created;
 
     @Column("updated_at")
-    Date updated;
+    LocalDateTime updated;
 
-    public User(String username, String password, String email, boolean admin, Date created, Date updated) {
+    public User(String username, String password, String email, boolean admin, LocalDateTime created, LocalDateTime updated) {
         this.username = username;
         this.password = password;
         this.email = email;

@@ -7,20 +7,30 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-@AllArgsConstructor
 @RequiredArgsConstructor
 @Getter(AccessLevel.PUBLIC)
 public class Invite {
 
     @Id
+    private long id;
+
+    @Column("code")
     private String code;
 
+    @Column("user_id")
     private long userId;
 
     private boolean admin;
 
     @Column("created_at")
-    private Date created;
+    private LocalDateTime created;
+
+    public Invite(String code, long userId, boolean admin, LocalDateTime created) {
+        this.code = code;
+        this.userId = userId;
+        this.admin = admin;
+        this.created = created;
+    }
 }
