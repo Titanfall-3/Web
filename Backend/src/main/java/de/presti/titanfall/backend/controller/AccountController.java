@@ -41,27 +41,25 @@ public class AccountController {
 
     @CrossOrigin
     @PostMapping("/auth")
-    public Mono<AuthResponse> auth(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(JSONObject.class).flatMap(jsonObject -> {
-            String username, password, version;
-            try {
-                username = jsonObject.getString("username");
-                password = jsonObject.getString("password");
-                version = jsonObject.getString("version");
-            } catch (JSONException e) {
-                return Mono.just(new AuthResponse(3, null, "Invalid JSON"));
+    public Mono<AuthResponse> auth(@RequestBody AuthForm authForm) {
+        if (authForm.username == null || authForm.password == null || authForm.version == null) {
+            return Mono.just(new AuthResponse(2, null, "Invalid post data"));
+        }
+
+        return userRepository.findByName(authForm.username).onErrorReturn(new User("", "", "", false, new Date(), new Date())).flatMap(user -> {
+            if (user.getUsername().isBlank()) {
+                return Mono.just(new AuthResponse(2, null, "User not found"));
             }
 
-            // TODO:: add future version check
-
-            return userRepository.findByName(username).onErrorReturn(new User("", "", "", false, new Date(), new Date())).flatMap(user -> {
-                if (HashUtil.encoder().matches(password, user.getPassword())) {
-                    return Mono.just(new AuthResponse(1, user, "Login successful!"));
-                } else {
-                    return Mono.just(new AuthResponse(2, null, "Invalid password"));
-                }
-            });
+            if (HashUtil.encoder().matches(authForm.password, user.getPassword())) {
+                return Mono.just(new AuthResponse(1, user, "Login successful!"));
+            } else {
+                return Mono.just(new AuthResponse(2, null, "Invalid password"));
+            }
         });
+    }
+
+    public record AuthForm(String username, String password, String version) {
     }
 
     public record AuthResponse(@NonNull int code, @Nullable User user, @Nullable String message) {
@@ -99,11 +97,16 @@ public class AccountController {
             if (!value) return Mono.just(new LoginResponse(false, null, "Invalid captcha"));
 
             return userRepository.findByName(loginForm.username).onErrorReturn(new User("", "", "", false, new Date(), new Date())).flatMap(user -> {
+
+                if (user.getUsername().isBlank()) {
+                    return Mono.just(new LoginResponse(false, null, "User not found"));
+                }
+
                 if (HashUtil.encoder().matches(loginForm.password, user.getPassword())) {
                     return sessionServices.generateSession(user.getId())
                             .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), "Login successful!")));
                 } else {
-                    return Mono.just(new LoginResponse(false, "", "Invalid password"));
+                    return Mono.just(new LoginResponse(false, null, "Invalid password"));
                 }
             });
         });
@@ -143,7 +146,7 @@ public class AccountController {
                             User newUser = new User(registerForm.username, HashUtil.encoder().encode(registerForm.password), registerForm.email, invite.isAdmin(), new Date(), new Date());
                             return userRepository.save(newUser)
                                     .flatMap(user -> sessionServices.generateSession(user.getId())
-                                    .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), "Register successful!"))));
+                                            .flatMap(session -> Mono.just(new LoginResponse(true, session.getToken(), "Register successful!"))));
                         });
                     });
         });

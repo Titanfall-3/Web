@@ -24,5 +24,4 @@ public class BackendApplication {
 
         return initializer;
     }
-
 }
