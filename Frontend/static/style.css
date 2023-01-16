@@ -29,9 +29,9 @@ body {
 }
 
 .center {
-  width: auto;
-  height: auto;
-  position: absolute;
+  width: 150px;
+  height: 150px;
+  align-self: center;
   top: 0;
   bottom: 0;
   left: 0;
@@ -40,8 +40,8 @@ body {
 }
 
 .rounded-rect {
-  width: 400px;
-  height: 300px;
+  width: auto;
+  height: auto;
   border-radius: 10px;
   align-self: center;
 }
