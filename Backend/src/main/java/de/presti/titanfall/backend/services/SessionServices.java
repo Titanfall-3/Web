@@ -67,15 +67,15 @@ public class SessionServices {
     public Mono<Session> checkAndRefreshSession(String token) {
 
         // Check if session exists
-        return sessionRepository.findAllById(Collections.singleton(token)).collectList().flatMap(sessions -> {
+        return sessionRepository.findByToken(token).collectList().flatMap(sessions -> {
 
             // Check if there are two sessions with the same token (really unlikely)
             if(sessions.size() > 1) {
-                return Mono.error(new Exception("Session expired"));
+                return Mono.error(new Exception("Too many Session -> expired"));
             }
 
             if(sessions.isEmpty()) {
-                return Mono.error(new Exception("Session expired"));
+                return Mono.error(new Exception("No Session -> expired"));
             }
 
             // Check if session is timed out
