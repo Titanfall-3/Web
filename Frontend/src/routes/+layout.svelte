@@ -1,7 +1,4 @@
 <script lang="ts">
-
-    // TODO:: use info from storage to access current info.
-
     import {wantsToLogin, wantsToRegister} from "../lib/store.js";
 </script>
 
@@ -15,8 +12,8 @@
                     wantsToRegister.update(v => (v) => '');
                 }} href="#home" style="color: var(--text-color);">Home</a></li>
                 <li class="nav-item"><a class="nav-link" on:click|preventDefault={() => {
-                    wantsToLogin.update(v => (v) => 'ye');
                     wantsToRegister.update(v => (v) => '');
+                    wantsToLogin.update(v => (v) => 'ye');
                 }} href="#login" style="color: var(--button-color);">Login</a></li>
                 <li class="nav-item"><a class="nav-link" on:click|preventDefault={() => {
                     wantsToLogin.update(v => (v) => '');
