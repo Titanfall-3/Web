@@ -1,16 +1,14 @@
 package de.presti.titanfall.backend.entities;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
 @RequiredArgsConstructor
-@Getter(AccessLevel.PUBLIC)
 public class Invite {
 
     @Id

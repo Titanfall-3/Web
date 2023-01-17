@@ -11,11 +11,11 @@ import reactor.core.publisher.Mono;
 public interface InviteRepository extends ReactiveCrudRepository<Invite, String> {
 
     @Query("SELECT * FROM invite WHERE user_id = :userid")
-    Flux<Invite> findAllByUser(long userId);
+    Flux<Invite> findAllByUser(long userid);
 
     @Query("SELECT * FROM invite WHERE code = :code")
     Mono<Invite> findByCode(String code);
 
-    @Query("SELECT * FROM invite WHERE admin = true")
+    @Query("SELECT * FROM invite WHERE admin = 1")
     Flux<Invite> findAllAdmin();
 }

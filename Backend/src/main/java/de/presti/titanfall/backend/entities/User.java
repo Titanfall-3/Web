@@ -6,8 +6,9 @@ import org.springframework.data.relational.core.mapping.Column;
 
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
 @RequiredArgsConstructor
-@Getter(AccessLevel.PUBLIC)
 public class User {
     @Id
     private long id;

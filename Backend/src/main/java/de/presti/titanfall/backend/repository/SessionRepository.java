@@ -17,5 +17,5 @@ public interface SessionRepository extends ReactiveCrudRepository<Session, Strin
     Flux<Session> findByToken(String token);
 
     @Query("DELETE FROM session WHERE user_id = :userId")
-    Mono<Void> deleteAllByUser(long userId);
+    Mono<Session> deleteAllByUser(long userId);
 }
