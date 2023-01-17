@@ -1,7 +1,7 @@
-import { writable } from "svelte/store";
+import {writable} from "svelte/store";
 import {browser} from "$app/environment";
 import {baseApiPath} from "$lib/config";
-import { getToken } from "$lib/store.js";
+import {getToken} from "$lib/store.js";
 
 let persistedUser = browser && localStorage.getItem('user')
 export let accountData = writable(persistedUser ? JSON.parse(persistedUser) : '')
@@ -29,7 +29,7 @@ export function refresh() {
         }
     }).then(resultJson => {
         if (resultJson.success) {
-            accountData.update(v => v =resultJson.user);
+            accountData.update(v => v = resultJson.user);
             return;
         }
 

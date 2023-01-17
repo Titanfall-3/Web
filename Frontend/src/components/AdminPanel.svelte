@@ -1,8 +1,5 @@
 <script>
-    import {accountData} from "../lib/account";
-
-    let user_value;
-    accountData.subscribe((u) => (user_value = u));
+    export let user_value;
 </script>
 
 <!-- Start: Hero Banner -->
