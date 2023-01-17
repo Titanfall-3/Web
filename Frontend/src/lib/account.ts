@@ -1,7 +1,8 @@
-import { getToken, baseApiPath } from "./config";
+import { getToken } from "./store.js";
+import { baseApiPath } from "./config";
 import { writable } from "svelte/store";
 
-export const accountData = writable<any>({})
+export let accountData = writable<JSON>()
 
 export function refreshAccount() {
     fetch(baseApiPath + '/api/account/refresh', {
@@ -18,7 +19,6 @@ export function refreshAccount() {
         }
     }).then(resultJson => {
         if (resultJson.success) {
-            document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
             accountData.set(resultJson.user);
             return;
         }

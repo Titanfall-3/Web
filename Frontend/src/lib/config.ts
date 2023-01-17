@@ -1,6 +1,1 @@
-export const baseApiPath = 'http://localhost:8444'
-import cookie from "cookie"
-
-export function getToken() {
-    return cookie.parse(document.cookie).token
-}
+export const baseApiPath = 'http://193.111.248.159:8444'

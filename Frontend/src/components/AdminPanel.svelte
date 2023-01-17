@@ -1,11 +1,11 @@
 <script>
-    import { accountData } from "../lib/account";
+    export let data;
 </script>
 
 <section id="admin" class="center">
     <h1>Admin Area</h1>
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
-        <h1>Welcome {accountData.username}</h1>
+        <h1>Welcome {data.username}</h1>
         <p>There will be more stuff soon!</p>
         <br />
     </div>

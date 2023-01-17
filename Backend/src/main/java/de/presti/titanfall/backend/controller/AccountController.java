@@ -86,11 +86,11 @@ public class AccountController {
                 .flatMap(session -> {
                     if (session == null) return Mono.error(new Exception("Invalid Session."));
 
-                    return userRepository.findById(session.getUserId());
-                }).flatMap(user -> {
-                    if (user == null) return Mono.error(new Exception("Invalid Session"));
+                    return Mono.zip(Mono.just(session),userRepository.findById(session.getUserId()));
+                }).flatMap(tuple -> {
+                    if (tuple.getT2() == null) return Mono.error(new Exception("Invalid Session"));
 
-                    return Mono.just(new RefreshResponse(true, UserUtil.createCleanUser(user), "Worked!"));
+                    return Mono.just(new RefreshResponse(true, UserUtil.createCleanUser(tuple.getT2()), tuple.getT1().getToken()));
                 })
                 .onErrorResume(Exception.class, e -> Mono.just(new RefreshResponse(false, null, e.getMessage())))
                 .onErrorReturn(new RefreshResponse(false, null, "Server Error!"));

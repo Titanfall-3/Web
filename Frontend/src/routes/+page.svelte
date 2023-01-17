@@ -1,15 +1,21 @@
 <script lang="ts">
     import { baseApiPath } from "../lib/config";
     import { accountData, refreshAccount } from "../lib/account";
-    import { isLoggedIn } from "../lib/store.js";
+    import { requesting, } from "../lib/store.js";
     import Panel from "../components/Panel.svelte";
     import { onMount } from "svelte";
 
     onMount(() => {
+        if ($requesting) return;
         refreshAccount()
     })
 
+    function isLoggedIn() {
+        return ($accountData === {})
+    }
+
     let tryingLogin = true;
+
     export let siteKey = "9dc06c51-f075-4f7a-9335-9346a4c7280a";
     let error;
     let message;
@@ -31,8 +37,8 @@
             }
         }).then(resultJson => {
             if (resultJson.success) {
-                document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
-                accountData.set(resultJson.user)
+                document.cookie = "token=" + resultJson.data + "; SameSite=Strict; path=/"
+                accountData.update(v => resultJson.user)
                 error = false;
                 return;
             }
@@ -60,8 +66,8 @@
             }
         }).then(resultJson => {
             if (resultJson.success) {
-                document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
-                accountData.set(resultJson.user)
+                document.cookie = "token=" + resultJson.data + "; SameSite=Strict; path=/"
+                accountData.update(v => resultJson.user)
                 error = false;
                 return;
             }
@@ -83,7 +89,7 @@
     </section>
 {/if}
 
-{#if tryingLogin && !isLoggedIn(accountData)}
+{#if tryingLogin && !isLoggedIn}
 <section id="login" class="login-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
         <form>
@@ -98,7 +104,7 @@
         </form>
     </div>
 </section>
-{:else if !tryingLogin && !isLoggedIn(accountData)}
+{:else if !tryingLogin && !isLoggedIn}
 <section id="register" class="register-prompt">
     <div class="rounded-rect" style="display: flex; justify-content: center; align-items: center; background-color: #333;">
         <form>
@@ -115,6 +121,6 @@
         </form>
     </div>
 </section>
-{:else if isLoggedIn(accountData)}
+{:else}
     <Panel />
 {/if}
