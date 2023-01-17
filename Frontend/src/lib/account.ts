@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import {browser} from "$app/environment";
 import {baseApiPath} from "$lib/config";
-import {getToken} from "$lib/store.js";
+import { getToken } from "$lib/store.js";
 
 let persistedUser = browser && localStorage.getItem('user')
 export let accountData = writable(persistedUser ? JSON.parse(persistedUser) : '')
@@ -10,7 +10,11 @@ if (browser) {
     accountData.subscribe(u => localStorage.user = JSON.stringify(u))
 }
 
-function refresh() {
+export function refresh() {
+    if (getToken() === undefined) {
+        localStorage.removeItem('user');
+        return;
+    }
     fetch(baseApiPath + '/api/account/refresh', {
         method: 'POST',
         headers: {
@@ -25,17 +29,18 @@ function refresh() {
         }
     }).then(resultJson => {
         if (resultJson.success) {
-            accountData.set(resultJson.user);
+            accountData.update(v => v =resultJson.user);
             return;
         }
 
+        accountData.update((u) => u = '');
         console.error(resultJson.message);
     }).catch(() => {
         console.error("Error while refreshing the Session!");
     });
 }
 
-function logout() {
+export function logout() {
     fetch(baseApiPath + '/api/account/invalidate', {
         method: 'POST',
         headers: {
