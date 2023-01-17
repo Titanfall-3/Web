@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface InviteRepository extends ReactiveCrudRepository<Invite, String> {
+public interface InviteRepository extends ReactiveCrudRepository<Invite, Long> {
 
     @Query("SELECT * FROM invite WHERE user_id = :userid")
     Flux<Invite> findAllByUser(long userid);

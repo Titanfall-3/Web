@@ -29,7 +29,7 @@ public class InviteController {
     @CrossOrigin
     @PostMapping("/create")
     public Mono<InviteResponse> create(@RequestBody InviteCreateForm inviteCreateForm) {
-        return sessionServices.checkAndRefreshSession(inviteCreateForm.sessionToken)
+        return sessionServices.checkAndRefreshSession(inviteCreateForm.token)
                 .flatMap(session -> {
                     if (session == null) return Mono.error(new Exception("Invalid Session."));
 
@@ -50,7 +50,7 @@ public class InviteController {
                 .onErrorReturn(new InviteResponse(false, "Server Error!"));
     }
 
-    public record InviteCreateForm(String sessionToken) {}
+    public record InviteCreateForm(String token) {}
 
     public record InviteResponse(boolean success, String message) {}
 

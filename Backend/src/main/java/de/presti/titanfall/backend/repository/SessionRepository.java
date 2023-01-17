@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface SessionRepository extends ReactiveCrudRepository<Session, String> {
+public interface SessionRepository extends ReactiveCrudRepository<Session, Long> {
 
     @Query("SELECT * FROM session WHERE user_id = :userId")
     Flux<Session> findByUser(long userId);

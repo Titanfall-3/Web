@@ -64,6 +64,14 @@ public class SessionServices {
         }).map(Tuple2::getT2);
     }
 
+    public Mono<Void> invalidateSession(String token) {
+        return sessionRepository.findByToken(token).elementAt(0)
+                .onErrorReturn(new Session("", 0, LocalDateTime.now(), LocalDateTime.now())).flatMap(session -> {
+                    if (session == null || session.getToken().isBlank()) return Mono.error(new Exception("Invalid Session"));
+            return sessionRepository.delete(session);
+        });
+    }
+
     public Mono<Session> checkAndRefreshSession(String token) {
 
         // Check if session exists
