@@ -30,7 +30,7 @@ export function refresh() {
     }).then(resultJson => {
         if (resultJson.success) {
             accountData.update(v => v = resultJson.user);
-            document.cookie = "token=" + resultJson.message + "; SameSite=Strict; path=/"
+            document.cookie = "token=" + resultJson.message + "; SameSite=Strict; Secure; path=/"
             return;
         }
 
@@ -56,7 +56,7 @@ export function logout() {
         }
     }).then(resultJson => {
         if (resultJson.success) {
-            document.cookie = "token=0; SameSite=Strict; path=/";
+            document.cookie = "token=0; SameSite=Strict; Secure; path=/";
             accountData.update((u) => u = '');
             return;
         }

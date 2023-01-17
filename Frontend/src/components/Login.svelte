@@ -22,7 +22,7 @@
             }
         }).then(resultJson => {
             if (resultJson.success) {
-                document.cookie = "token=" + resultJson.data + "; SameSite=Strict; path=/"
+                document.cookie = "token=" + resultJson.data + "; SameSite=Strict; Secure; path=/"
                 accountData.update(v => v = resultJson.user)
                 error = false;
                 return;
