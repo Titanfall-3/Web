@@ -1,5 +1,70 @@
-<script>
-    export let user_value;
+<script lang="ts">
+    import {accountData} from "$lib/account";
+    import {getToken} from "$lib/store.js";
+    import {baseApiPath} from "$lib/config.js";
+
+    let user_value;
+    accountData.subscribe((u) => (user_value = u));
+
+    let newsTitle: string, newsContent: string, newsThumbnail: string;
+    let generatedInvite: string = 'Result';
+    let error;
+    let message;
+
+    function createNews() {
+        fetch(baseApiPath + '/api/news/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({token: getToken(), title: newsTitle, content: newsContent, thumbnail: newsThumbnail})
+        }).then(result => {
+            if (result.ok) {
+                return result.json()
+            } else {
+                throw error;
+            }
+        }).then(resultJson => {
+            if (resultJson.success) {
+                error = false;
+                return;
+            }
+
+            error = true;
+            message = resultJson.message;
+        }).catch(() => {
+            error = true;
+            message = 'Server Error!'
+        })
+    }
+
+    function createInvite() {
+        fetch(baseApiPath + '/api/invite/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({token: getToken()})
+        }).then(result => {
+            if (result.ok) {
+                return result.json()
+            } else {
+                throw error;
+            }
+        }).then(resultJson => {
+            if (resultJson.success) {
+                generatedInvite = resultJson.message;
+                error = false;
+                return;
+            }
+
+            error = true;
+            message = resultJson.message;
+        }).catch(() => {
+            error = true;
+            message = 'Server Error!'
+        })
+    }
 </script>
 
 <!-- Start: Hero Banner -->
@@ -78,11 +143,11 @@
                         <h2 class="text-center mb-4">Create News</h2>
                         <form method="post">
                             <!-- Start: Success Example -->
-                            <div class="mb-3"><input class="form-control" type="text" id="name-2" name="title" placeholder="Title"></div><!-- End: Success Example -->
+                            <div class="mb-3"><input class="form-control" type="text" bind:value={newsTitle} name="title" placeholder="Title"></div><!-- End: Success Example -->
                             <!-- Start: Error Example -->
-                            <div class="mb-3"><input class="form-control" type="url" name="thumbnail" placeholder="Thumbnail"></div><!-- End: Error Example -->
-                            <div class="mb-3"><textarea class="form-control" id="message-2" name="content" rows="6" placeholder="Content"></textarea></div>
-                            <div><button class="btn btn-primary d-block w-100" type="submit">Send </button></div>
+                            <div class="mb-3"><input class="form-control" type="url" bind:value={newsThumbnail} name="thumbnail" placeholder="Thumbnail"></div><!-- End: Error Example -->
+                            <div class="mb-3"><textarea class="form-control" bind:value={newsContent} name="content" rows="6" placeholder="Content"></textarea></div>
+                            <div><button class="btn btn-primary d-block w-100" type="submit" on:click|preventDefault={createNews}>Send </button></div>
                         </form>
                     </div>
                 </div>
@@ -93,11 +158,11 @@
                         <h2 class="text-center mb-4">Create Invite</h2>
                         <form method="post">
                             <!-- Start: Success Example -->
-                            <div class="mb-3"><input class="form-control" type="text" id="name-1" name="title" placeholder="Result" readonly=""></div><!-- End: Success Example -->
+                            <div class="mb-3"><input class="form-control" type="text" name="title" placeholder="Result" readonly value="{generatedInvite}"></div><!-- End: Success Example -->
                             <!-- Start: Error Example -->
                             <div class="mb-3"></div><!-- End: Error Example -->
                             <div class="mb-3"></div>
-                            <div><button class="btn btn-primary d-block w-100" type="submit">Generate</button></div>
+                            <div><button class="btn btn-primary d-block w-100" type="submit" on:click|preventDefault={createInvite}>Generate</button></div>
                         </form>
                     </div>
                 </div>

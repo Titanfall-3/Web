@@ -1,1 +1,1 @@
-export const baseApiPath = 'http://193.111.248.159:8444'
+export const baseApiPath = 'https://api-titanfall.presti.me'

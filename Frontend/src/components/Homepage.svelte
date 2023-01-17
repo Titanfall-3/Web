@@ -14,7 +14,7 @@
                 </svg></div>
                 <div class="px-3">
                     <h4>Open Source</h4>
-                    <p>The entirety of this project is open source and accessible on Github for everyone!</p><a href="https://github.titanfall.presti.me">Check us out&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right">
+                    <p>The entirety of this project is open source and accessible on Github for everyone!</p><a href="https://github-titanfall.presti.me">Check us out&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right">
                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path>
                 </svg></a>
                 </div>
@@ -28,7 +28,7 @@
                 </svg></div>
                 <div class="px-3">
                     <h4>No Money</h4>
-                    <p>This project is funded by us and only us, there is no hidden money grab, no paywall. Nothing! Its completly free!</p>
+                    <p>This project is funded by us and only us, there is no hidden money grab, no paywall. Nothing! Its completely free!</p>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
     <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-lg-3" style="text-align: left;">
         <div class="col" style="text-align: left;">
             <div class="card border-0 shadow-none" style="background: var(--button-color);">
-                <div class="card-body d-flex align-items-center p-0"><img alt="harald-profile" class="rounded-circle flex-shrink-0 me-3 fit-cover" width="130" height="130" src="%sveltekit.assets%/img/harald.png">
+                <div class="card-body d-flex align-items-center p-0"><img alt="harald-profile" class="rounded-circle flex-shrink-0 me-3 fit-cover" width="130" height="130" src="https://images.ree6.de/harald.png">
                     <div>
                         <h5 class="fw-bold text-primary mb-0">Harald</h5>
                         <p class="text-muted mb-1">Project Creator/Developer</p>
@@ -91,7 +91,7 @@
                                 </svg></a></div>
                             </li>
                         </ul>
-                    </div><img alt="presti-profile" class="rounded-circle flex-shrink-0 me-3 fit-cover" width="130" height="130" src="%sveltekit.assets%/img/presti.png">
+                    </div><img alt="presti-profile" class="rounded-circle flex-shrink-0 me-3 fit-cover" width="130" height="130" src="https://images.ree6.de/presti.png">
                 </div>
             </div>
         </div>

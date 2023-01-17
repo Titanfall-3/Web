@@ -30,6 +30,7 @@ export function refresh() {
     }).then(resultJson => {
         if (resultJson.success) {
             accountData.update(v => v = resultJson.user);
+            document.cookie = "token=" + resultJson.message + "; SameSite=Strict; Secure; path=/"
             return;
         }
 
@@ -55,13 +56,14 @@ export function logout() {
         }
     }).then(resultJson => {
         if (resultJson.success) {
+            document.cookie = "token=0; SameSite=Strict; Secure; path=/";
             accountData.update((u) => u = '');
             return;
         }
 
         console.error(resultJson.message);
     }).catch(() => {
-        console.error("Error while refreshing the Session!");
+        console.error("Error while logging out the Session!");
     });
 }
 
