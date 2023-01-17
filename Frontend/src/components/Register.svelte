@@ -1,6 +1,7 @@
 <script lang="ts">
     import {baseApiPath} from "$lib/config";
     import {accountData} from "$lib/account";
+    import {wantsToLogin, wantsToRegister} from "$lib/store.js";
 
     let username: string, password: string, email: string, invite: string;
     let error;
@@ -63,7 +64,7 @@
                             <div class="mb-3"><input class="form-control" bind:value={password} type="password" name="password" placeholder="Password"></div>
                             <div class="mb-3"><input class="form-control" bind:value={invite} type="password" name="invite" placeholder="Invite"></div>
                             <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit" on:click|preventDefault={register}>Register</button></div>
-                            <p class="text-muted" style="color: var(--text-color);">You have a account? <a href="#login">Login here</a></p>
+                            <p class="text-muted" style="color: var(--text-color);">You have a account? <a href="#login" on:click|preventDefault={() => {wantsToRegister.update((u) => u = false); wantsToLogin.update((u) => u = true);}}>Login here</a></p>
                         </form>
                     </div>
                 </div>

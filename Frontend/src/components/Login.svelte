@@ -1,6 +1,7 @@
 <script lang="ts">
     import {baseApiPath} from "$lib/config";
     import {accountData} from "$lib/account";
+    import {wantsToLogin, wantsToRegister} from "$lib/store.js";
 
     let username: string, password: string;
     let error;
@@ -54,9 +55,9 @@
                         <form class="text-center" method="post">
                             <div class="mb-3"><input class="form-control" bind:value={username} type="text" name="username" placeholder="Username"></div>
                             <div class="mb-3"><input class="form-control" bind:value={password} type="password" name="password" placeholder="Password"></div>
-                            <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit" on:click|preventDefault={login()}>Login</button></div>
-                            <p class="text-muted" style="color: var(--text-color);">No Account yet? <a href="#register">Create on here</a></p>
-                            <p class="text-muted" style="color: var(--text-color);">Forgot your password?<a href="https://discord.titanfall.presti.me">Join the Discord!</a></p>
+                            <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit" on:click|preventDefault={login}>Login</button></div>
+                            <p class="text-muted" style="color: var(--text-color);">No Account yet? <a on:click|preventDefault={() => {wantsToLogin.update((u) => u = false); wantsToRegister.update((u) => u = true);}} href="#register">Create on here</a></p>
+                            <p class="text-muted" style="color: var(--text-color);">Forgot your password? <a href="https://discord.titanfall.presti.me">Join the Discord!</a></p>
                         </form>
                     </div>
                 </div>
