@@ -88,7 +88,7 @@ public class AccountController {
                 .flatMap(session -> {
                     if (session == null) return Mono.error(new Exception("Invalid Session."));
 
-                    return Mono.zip(Mono.just(session),userRepository.findById(session.getUserId()));
+                    return Mono.zip(Mono.just(session), userRepository.findById(session.getUserId()));
                 }).flatMap(tuple -> {
                     if (tuple.getT2() == null) return Mono.error(new Exception("Invalid Session"));
 
@@ -116,13 +116,17 @@ public class AccountController {
         if (logoutForm.token == null) return Mono.just(new LogoutResponse(false, "No valid session"));
 
         return sessionServices.invalidateSession(logoutForm.token).flatMap(v -> {
-            return Mono.just(new LogoutResponse(true, "Deleted"));
-        }).onErrorReturn(new LogoutResponse(false, "Invalid Session"));
+                    return Mono.just(new LogoutResponse(true, "Deleted"));
+                })
+                .onErrorResume(Exception.class, e -> Mono.just(new LogoutResponse(false, e.getMessage())))
+                .onErrorReturn(new LogoutResponse(false, "Invalid Session"));
     }
 
-    public record LogoutForm(String token) {}
+    public record LogoutForm(String token) {
+    }
 
-    public record LogoutResponse(boolean success, String message) {}
+    public record LogoutResponse(boolean success, String message) {
+    }
 
     //endregion
 
