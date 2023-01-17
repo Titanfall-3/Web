@@ -9,6 +9,7 @@ import de.presti.titanfall.backend.services.SessionServices;
 import de.presti.titanfall.backend.utils.CaptchaUtil;
 import de.presti.titanfall.backend.utils.HashUtil;
 import de.presti.titanfall.backend.utils.UserUtil;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -79,6 +80,7 @@ public class AccountController {
     //endregion
 
     //region Refresh
+
     @CrossOrigin
     @PostMapping("/refresh")
     public Mono<RefreshResponse> refresh(@RequestBody RefreshForm refreshForm) {
@@ -103,6 +105,24 @@ public class AccountController {
     public record RefreshForm(String token) {
     }
 
+
+    //endregion
+
+    //region Logout
+
+    @CrossOrigin
+    @PostMapping("/invalidate")
+    public Mono<LogoutResponse> logout(@RequestBody LogoutForm logoutForm) {
+        if (logoutForm.token == null) return Mono.just(new LogoutResponse(false, "No valid session"));
+
+        return sessionServices.invalidateSession(logoutForm.token).flatMap(v -> {
+            return Mono.just(new LogoutResponse(true, "Deleted"));
+        }).onErrorReturn(new LogoutResponse(false, "Invalid Session"));
+    }
+
+    public record LogoutForm(String token) {}
+
+    public record LogoutResponse(boolean success, String message) {}
 
     //endregion
 
