@@ -11,6 +11,7 @@ import de.presti.titanfall.backend.utils.HashUtil;
 import de.presti.titanfall.backend.utils.UserUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class AccountController {
     //region Auth
 
     @CrossOrigin
-    @PostMapping("/auth")
+    @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<AuthResponse> auth(@RequestBody AuthForm authForm) {
         if (authForm.username == null || authForm.password == null || authForm.version == null) {
             return Mono.just(new AuthResponse(2, null, "Invalid post data"));
@@ -82,7 +83,7 @@ public class AccountController {
     //region Refresh
 
     @CrossOrigin
-    @PostMapping("/refresh")
+    @PostMapping(value = "/refresh", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<RefreshResponse> refresh(@RequestBody RefreshForm refreshForm) {
         return sessionServices.checkAndRefreshSession(refreshForm.token)
                 .flatMap(session -> {
@@ -111,7 +112,7 @@ public class AccountController {
     //region Logout
 
     @CrossOrigin
-    @PostMapping("/invalidate")
+    @PostMapping(value = "/invalidate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<LogoutResponse> logout(@RequestBody LogoutForm logoutForm) {
         if (logoutForm.token == null) return Mono.just(new LogoutResponse(false, "No valid session"));
 
@@ -133,7 +134,7 @@ public class AccountController {
     //region Login
 
     @CrossOrigin
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<LoginResponse> login(@RequestBody LoginForm loginForm) {
 
         //// Optional<Object> optionalCaptcha = serverRequest.attribute("h-captcha-response");
@@ -177,7 +178,7 @@ public class AccountController {
     //region Register
 
     @CrossOrigin
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<LoginResponse> register(@RequestBody RegisterForm registerForm) {
 
         //// Optional<Object> optionalCaptcha = serverRequest.attribute("h-captcha-response");

@@ -5,6 +5,7 @@ import de.presti.titanfall.backend.repository.InviteRepository;
 import de.presti.titanfall.backend.repository.UserRepository;
 import de.presti.titanfall.backend.services.SessionServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -27,7 +28,7 @@ public class InviteController {
     }
 
     @CrossOrigin
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<InviteResponse> create(@RequestBody InviteCreateForm inviteCreateForm) {
         return sessionServices.checkAndRefreshSession(inviteCreateForm.token)
                 .flatMap(session -> {
