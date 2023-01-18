@@ -1,6 +1,5 @@
 package de.presti.titanfall.backend.controller;
 
-import com.google.gson.JsonObject;
 import de.presti.titanfall.backend.entities.Invite;
 import de.presti.titanfall.backend.entities.User;
 import de.presti.titanfall.backend.repository.InviteRepository;
@@ -9,7 +8,6 @@ import de.presti.titanfall.backend.services.SessionServices;
 import de.presti.titanfall.backend.utils.CaptchaUtil;
 import de.presti.titanfall.backend.utils.HashUtil;
 import de.presti.titanfall.backend.utils.UserUtil;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -22,8 +20,6 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
-
-    String clientAuthSecret = "YOUR_SECRET";
 
     private final UserRepository userRepository;
     private final InviteRepository inviteRepository;
@@ -43,7 +39,7 @@ public class AccountController {
     @CrossOrigin
     @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<AuthResponse> auth(@RequestBody AuthForm authForm, @RequestParam String secret) {
-        if (secret.equals(clientAuthSecret)) return Mono.just(new AuthResponse(2, 0, null, "Invalid secret"));
+        if (!secret.equals(HashUtil.authSecret)) return Mono.just(new AuthResponse(2, 0, null, "Invalid secret"));
         if (authForm.username == null || authForm.password == null || authForm.version == null) {
             return Mono.just(new AuthResponse(2, 0, null, "Invalid post data"));
         }

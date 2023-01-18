@@ -8,6 +8,8 @@ import java.security.SecureRandom;
 
 public class HashUtil {
 
+    public static String authSecret = "";
+
     @Bean
     public static PasswordEncoder encoder() {
         return new BCryptPasswordEncoder(-1, new SecureRandom());
