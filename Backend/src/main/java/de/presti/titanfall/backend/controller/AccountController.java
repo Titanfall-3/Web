@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/account")
 public class AccountController {
 
+    String clientAuthSecret = "YOUR_SECRET";
+
     private final UserRepository userRepository;
     private final InviteRepository inviteRepository;
     private final SessionServices sessionServices;
@@ -40,21 +42,22 @@ public class AccountController {
 
     @CrossOrigin
     @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<AuthResponse> auth(@RequestBody AuthForm authForm) {
+    public Mono<AuthResponse> auth(@RequestBody AuthForm authForm, @RequestParam String secret) {
+        if (secret.equals(clientAuthSecret)) return Mono.just(new AuthResponse(2, 0, null, "Invalid secret"));
         if (authForm.username == null || authForm.password == null || authForm.version == null) {
-            return Mono.just(new AuthResponse(2, null, "Invalid post data"));
+            return Mono.just(new AuthResponse(2, 0, null, "Invalid post data"));
         }
 
         return userRepository.findByName(authForm.username).elementAt(0).onErrorReturn(new User("", "", "", false,
                 LocalDateTime.now(), LocalDateTime.now())).flatMap(user -> {
             if (user.getUsername().isBlank()) {
-                return Mono.just(new AuthResponse(2, null, "User not found"));
+                return Mono.just(new AuthResponse(2, 0, null, "User not found"));
             }
 
             if (HashUtil.encoder().matches(authForm.password, user.getPassword())) {
-                return Mono.just(new AuthResponse(1, user, "Login successful!"));
+                return Mono.just(new AuthResponse(1, user.getId(), user.getUsername(), "Login successful!"));
             } else {
-                return Mono.just(new AuthResponse(2, null, "Invalid password"));
+                return Mono.just(new AuthResponse(2, 0, null, "Invalid password"));
             }
         });
     }
@@ -62,20 +65,7 @@ public class AccountController {
     public record AuthForm(String username, String password, String version) {
     }
 
-    public record AuthResponse(@NonNull int code, @Nullable User user, @Nullable String message) {
-
-        @Override
-        public String toString() {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("ResultCode", code);
-            if (user != null && code == 1) {
-                jsonObject.addProperty("UserId", user.getId());
-                jsonObject.addProperty("Nickname", user.getUsername());
-            }
-
-            if (message != null) jsonObject.addProperty("message", message);
-            return jsonObject.toString();
-        }
+    public record AuthResponse(@NonNull int ResultCode, @NonNull long UserId, @Nullable String Nickname, @Nullable String message) {
     }
 
     //endregion
