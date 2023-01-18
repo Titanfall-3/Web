@@ -72,14 +72,6 @@
                             <p class="text-primary card-text mb-0">Changelog</p>
                             <h4 class="card-title">{nw.title}<br></h4>
                             <p class="card-text">{nw.content}</p>
-                            <div class="d-flex"><img alt="newswriter"
-                                                     class="rounded-circle flex-shrink-0 me-3 fit-cover"
-                                                     width="50" height="50" src="%sveltekit.assets%/img/presti.png">
-                                <div>
-                                    <p class="fw-bold mb-0">Presti</p>
-                                    <p class="text-muted mb-0">Administrator</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
