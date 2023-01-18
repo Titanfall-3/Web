@@ -12,7 +12,6 @@
     let tryingLogin;
     let tryingRegister;
 
-
     let unsubscribe = accountData.subscribe((u) => (user_value = u));
     let unsubscribeLogin = wantsToLogin.subscribe((u) => (tryingLogin = u))
     let unsubscribeRegister = wantsToRegister.subscribe((u) => (tryingRegister = u));
